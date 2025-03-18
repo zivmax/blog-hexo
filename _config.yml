@@ -154,5 +154,5 @@ theme: next
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: 'git'
-  repository: git@github.com:zivmax/zivmax.github.io.git
-  branch: hexo
+  repository: git@github.com:zivmax/blog-hexo.git
+  branch: pages
