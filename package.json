@@ -15,13 +15,13 @@
     "@renbaoshuo/markdown-it-katex": "^2.0.2",
     "composer": "^4.1.0",
     "gh-pages": "^6.3.0",
-    "hexo": "^7.0.0",
+    "hexo": "^7.3.0",
     "hexo-deployer-git": "^4.0.0",
     "hexo-filter-image": "^1.2.3",
     "hexo-generator-archive": "^2.0.0",
     "hexo-generator-category": "^2.0.0",
     "hexo-generator-feed": "^3.0.0",
-    "hexo-generator-index": "^3.0.0",
+    "hexo-generator-index": "^4.0.0",
     "hexo-generator-search": "^2.4.3",
     "hexo-generator-tag": "^2.0.0",
     "hexo-reference": "^1.0.4",
@@ -29,14 +29,14 @@
     "hexo-renderer-markdown-it": "^7.0.0",
     "hexo-renderer-stylus": "^3.0.0",
     "hexo-server": "^3.0.0",
-    "hexo-symbols-count-time": "^0.6.2",
+    "hexo-symbols-count-time": "^0.7.1",
     "hexo-tag-aplayer": "^3.0.4",
-    "hexo-theme-landscape": "^1.0.0",
+    "hexo-theme-landscape": "^1.1.0",
     "hexo-theme-next": "^8.19.1",
-    "katex": "^0.16.4",
+    "katex": "^0.16.21",
     "npm-check": "^3.2.10"
   },
   "devDependencies": {
-    "highlight.js": "^11.7.0"
+    "highlight.js": "^11.11.1"
   }
 }
