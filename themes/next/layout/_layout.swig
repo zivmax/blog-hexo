@@ -12,7 +12,7 @@
   <div id="aplayer"></div>
   <script src="/dist/APlayer.min.js"></script>
   <!-- require MetingJS -->
-  <script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+  <script src="/dist/Meting.min.js"></script>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
