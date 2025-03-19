@@ -36,6 +36,6 @@
     "npm-check": "^3.2.10"
   },
   "devDependencies": {
-    "highlight.js": "^11.7.0"
+    "highlight.js": "^11.11.1"
   }
 }
