@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN,en,default">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/soundwave.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/soundwave.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/soundwave.svg">
+  <link rel="mask-icon" href="/images/soundwave.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"hexo-archive.zivmax.top","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"hide","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":true},"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Goals  Run and debug RISC-V assembly code. Write RISC-V functions using the right calling procedure. Get an idea of how to translate C code to RISC-V">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CS110 Lab [3]">
+<meta property="og:url" content="https://hexo-archive.zivmax.top/%E5%AD%A6%E4%B9%A0/%E4%BD%9C%E4%B8%9A/2024/03/26/CS110/CS110-Lab-3/index.html">
+<meta property="og:site_name" content="青山后小塘">
+<meta property="og:description" content="Goals  Run and debug RISC-V assembly code. Write RISC-V functions using the right calling procedure. Get an idea of how to translate C code to RISC-V">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-26T03:17:40.000Z">
+<meta property="article:modified_time" content="2025-03-19T13:11:10.818Z">
+<meta property="article:author" content="Zivmax">
+<meta property="article:tag" content="计算机科学">
+<meta property="article:tag" content="上科大">
+<meta property="article:tag" content="CS110">
+<meta property="article:tag" content="计算机体系架构">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://hexo-archive.zivmax.top/%E5%AD%A6%E4%B9%A0/%E4%BD%9C%E4%B8%9A/2024/03/26/CS110/CS110-Lab-3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CS110 Lab [3] | 青山后小塘</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <!-- require APlayer -->
+  <link rel="stylesheet" href="/dist/APlayer.min.css"media="all">
+  <div id="aplayer"></div>
+  <script src="/dist/APlayer.min.js"></script>
+  <!-- require MetingJS -->
+  <script src="/dist/Meting.min.js"></script>
+<link rel="alternate" href="/atom.xml" title="青山后小塘" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta custom-logo">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">青山后小塘</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">人生如逆旅，我亦是行人</p>
+      <a>
+        <img class="custom-logo-image" src="/uploads/cib-boeing.svg" alt="青山后小塘">
+      </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签<span class="badge">46</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类<span class="badge">15</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档<span class="badge">95</span></a>
+
+  </li>
+        <li class="menu-item menu-item-playlist">
+
+    <a href="/playlist/" rel="section"><i class="fa fa-music fa-fw"></i>歌单</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://hexo-archive.zivmax.top/%E5%AD%A6%E4%B9%A0/%E4%BD%9C%E4%B8%9A/2024/03/26/CS110/CS110-Lab-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Zivmax">
+      <meta itemprop="description" content="记录我在 STU 的所见所闻,以及成长">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="青山后小塘">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CS110 Lab [3]
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间: 2024-03-26 11:17:40" itemprop="dateCreated datePublished" datetime="2024-03-26T11:17:40+08:00">2024-03-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间: 2025-03-19 21:11:10" itemprop="dateModified" datetime="2025-03-19T21:11:10+08:00">2025-03-19</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/%E4%BD%9C%E4%B8%9A/" itemprop="url" rel="index"><span itemprop="name">作业</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数: </span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>28 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p><strong>Goals</strong></p>
+<ul>
+<li>Run and debug RISC-V assembly code.</li>
+<li>Write RISC-V functions using the right calling procedure.</li>
+<li>Get an idea of how to translate C code to RISC-V</li>
+</ul>
+<span id="more"></span>
+<h1 id="Lab-3">Lab 3</h1>
+<p><a target="_blank" rel="noopener" href="https://toast-lab.sist.shanghaitech.edu.cn/courses/CS110@ShanghaiTech/Spring-2024/index.html">Computer Architecture I</a> @ <a target="_blank" rel="noopener" href="https://www.shanghaitech.edu.cn/">ShanghaiTech University</a></p>
+<h2 id="Exercises">Exercises</h2>
+<p>Download the <a target="_blank" rel="noopener" href="https://toast-lab.sist.shanghaitech.edu.cn/courses/CS110@ShanghaiTech/Spring-2024/labs/Lab3/lab3.zip">files</a> for Lab 3 first.</p>
+<h2 id="Intro-to-Assembly-with-RISC-V-Simulator">Intro to Assembly with RISC-V Simulator</h2>
+<p>So far, we have been dealing with C program files (.c file extension), and have been using the gcc compiler to execute these higher-level language programs. Now, we are learning about the RISC-V assembly language, which is a lower-level language much closer to machine code. For context, gcc takes the C code we write, first compiles this down to assembly code (gcc uses a more complex assembly language than RISC-V), and then assembles this down to machine code/binary.</p>
+<p>In this lab, we will deal with several RISC-V assembly program files, each of which have a .s file extension. To run these, we will need to use a RISC-V simulator. The simulator we will use was developed by <a target="_blank" rel="noopener" href="https://github.com/kvakil">Keyhan Vakil</a> and improved by <a target="_blank" rel="noopener" href="https://github.com/ThaumicMekanism">Stephan Kaminsky</a>. The simulator is called <strong>Venus</strong> and can be found online <a target="_blank" rel="noopener" href="https://venus.cs61c.org/">here</a>. We have deployed Venus on our Autolab server (<a target="_blank" rel="noopener" href="https://autolab.sist.shanghaitech.edu.cn/venus/">link</a>).</p>
+<h3 id="Assembly-Venus-Basics">Assembly/Venus Basics</h3>
+<ul>
+<li>Enter your RISC-V code in the “Editor” tab</li>
+<li>Programs start at the first line regardless of the label. That means that the main function must be put first.</li>
+<li>Programs end with an ecall with argument value 10. This signals for the program to exit. The ecall instructions are analogous to <a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/System_call">System Calls</a> and allow us to do things such as print to the console or request chunks of memory from the heap.</li>
+<li>Labels end with a colon (😃.</li>
+<li>Comments start with a pound sign (#).</li>
+<li>You CANNOT put more than one instruction per line.</li>
+<li>When you are done editing, click the “Simulator” tab to prepare for execution.</li>
+</ul>
+<p><strong>For the following exercises, please save your completed code in a file on your local machine. This is crucial for the checkoff portion to work.</strong></p>
+<h2 id="Exercise-1-Familiarizing-yourself-with-Venus">Exercise 1: Familiarizing yourself with Venus</h2>
+<p>Getting started:</p>
+<ol>
+<li>Paste the contents of <code>lab3_ex1.s</code> into the editor.</li>
+<li>Click the “Simulator” tab. This will prepare the code you wrote for execution.</li>
+<li>In the simulator, click “Assemble &amp; Simulate from Editor”</li>
+<li>In the simulator, to execute the next instruction, click the “step” button.</li>
+<li>To undo an instruction, click the “prev” button.</li>
+<li>To run the program to completion, click the “run” button.</li>
+<li>To reset the program from the start, click the “reset” button.</li>
+<li>The contents of all 32 registers are on the right-hand side, and the console output is at the bottom</li>
+<li>To view the contents of memory, click the “Memory” tab on the right. You can navigate to different portions of your memory using the dropdown menu at the bottom.</li>
+</ol>
+<h3 id="Action-Item">Action Item</h3>
+<p>Record your answers to the following questions in a text file. Some of the questions will require you to run the RISC-V code using Venus’ simulator tab.</p>
+<ol>
+<li>What do the .data, .word, .text directives mean (i.e. what do you use them for)? <strong>Hint</strong>: think about the 4 sections of memory.</li>
+<li>Run the program to completion. What number did the program output? What does this number represent?</li>
+<li>At what address is n stored in memory? <strong>Hint</strong>: Look at the contents of the registers.</li>
+<li>Without using the “Edit” tab, have the program calculate the 13th fib number (0-indexed) by <em>manually</em> modifying the value of a register. You may find it helpful to first step through the code. If you prefer to look at decimal values, change the “Display Settings” option at the bottom.</li>
+</ol>
+<h4 id="Check-off">Check-off</h4>
+<p>Show your TA that you are able to run through the above steps and provide answers to the questions.</p>
+<h2 id="Exercise-2-Translating-from-C-to-RISC-V">Exercise 2: Translating from C to RISC-V</h2>
+<p>Open the files <code>lab3_ex2.c</code> and <code>lab3_ex2.s</code>. The assembly code provided (.s file) is a translation of the given C program into RISC-V.</p>
+<h3 id="Action-Item-2">Action Item</h3>
+<p>Find/explain the following components of the assembly file and put your answers in a text file.</p>
+<ul>
+<li>The register representing the variable k.</li>
+<li>The registers acting as pointers to the source and dest arrays.</li>
+<li>The assembly code for the loop found in the C code.</li>
+<li>How the pointers are manipulated in the assembly code.</li>
+</ul>
+<p>After you’ve answered explained the above components, edit lab3_ex2.s so that it dest satisfies the following conditions.</p>
+<ul>
+<li>dest[i] = 2 * source[i] for even i</li>
+<li>dest[i] = 1 for odd i</li>
+</ul>
+<p><strong>Hint</strong>: This can be done by adding one line of code and modifying another (in other words, you only need to make 2 changes). Look at the initial values of dest; how does this help you implement this modification?</p>
+<p>Verify that your changes work for the given source and dest arrays by running your code in a new Venus tab and check that the output looks like:</p>
+<p>3 1 4 1 5 9<br>
+6 1 8 1 10 1</p>
+<h4 id="Check-off-2">Check-off</h4>
+<p>Show lab3_ex2.s to your TA, and run it in Venus, which should give the correct result.</p>
+<h2 id="Exercise-3-SquareSum">Exercise 3: SquareSum</h2>
+<p>In this exercise, you will be implementing a function squareSum in RISC-V that calculates the summation of squares of integers n and returns ans. A stub of this function can be found in the file <code>lab3_ex3.s</code>. You will only need to add instructions under the squareSum label, and the arguments that are passed into the function are defined at the top of the file. You may solve this problem using either recursion or iteration.</p>
+<p>The formula for the summation is as follows:</p>
+<ul>
+<li>ans = n^2 + (n-1)^2 + (n-2)^2 + ... + 1^2 for n &gt; 0</li>
+<li>ans = 0 for n = 0</li>
+<li>ans = n^2 + (n+1)^2 + (n+2)^2 + ... + (-1)^2 for n &lt; 0</li>
+</ul>
+<h3 id="Action-Item-3">Action Item</h3>
+<p>Implement squareSum and make sure that the program can correctly output the answers when the inputs are -6, -3, 5, and 11.</p>
+<h4 id="Check-off-3">Check-off</h4>
+<p>Show lab3_ex3.s to your TA, and run it in Venus, which should give the correct result.</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6/" rel="tag"># 计算机科学</a>
+              <a href="/tags/%E4%B8%8A%E7%A7%91%E5%A4%A7/" rel="tag"># 上科大</a>
+              <a href="/tags/CS110/" rel="tag"># CS110</a>
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E4%BD%93%E7%B3%BB%E6%9E%B6%E6%9E%84/" rel="tag"># 计算机体系架构</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%AD%A6%E4%B9%A0/%E4%BD%9C%E4%B8%9A/2024/03/26/CS110/CS110-Lab-2/" rel="prev" title="CS110 Lab 2">
+      <i class="fa fa-chevron-left"></i> CS110 Lab 2
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E5%AD%A6%E4%B9%A0/%E4%BD%9C%E4%B8%9A/2024/03/26/CS110/CS110-Lab-4/" rel="next" title="CS110 Lab [4]">
+      CS110 Lab [4] <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Lab-3"><span class="nav-text">Lab 3</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Exercises"><span class="nav-text">Exercises</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Intro-to-Assembly-with-RISC-V-Simulator"><span class="nav-text">Intro to Assembly with RISC-V Simulator</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Assembly-Venus-Basics"><span class="nav-text">Assembly&#x2F;Venus Basics</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Exercise-1-Familiarizing-yourself-with-Venus"><span class="nav-text">Exercise 1: Familiarizing yourself with Venus</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Action-Item"><span class="nav-text">Action Item</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Check-off"><span class="nav-text">Check-off</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Exercise-2-Translating-from-C-to-RISC-V"><span class="nav-text">Exercise 2: Translating from C to RISC-V</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Action-Item-2"><span class="nav-text">Action Item</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Check-off-2"><span class="nav-text">Check-off</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Exercise-3-SquareSum"><span class="nav-text">Exercise 3: SquareSum</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Action-Item-3"><span class="nav-text">Action Item</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Check-off-3"><span class="nav-text">Check-off</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="https://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Zivmax"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Zivmax</p>
+  <div class="site-description" itemprop="description">记录我在 STU 的所见所闻,以及成长</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">95</span>
+          <span class="site-state-item-name">日志</span>
+          
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">46</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/zivmax" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;zivmax" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zivmax@foxmail.com" title="E-Mail → mailto:zivmax@foxmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/wechat/" title="Wechat → &#x2F;wechat&#x2F;"><i class="fab fa-weixin fa-fw"></i>Wechat</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/QQ/" title="QQ → &#x2F;QQ&#x2F;"><i class="fab fa-qq fa-fw"></i>QQ</a>
+      </span>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+          
+        </div>
+  
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2022-8-11 – 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-flag"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Zivmax</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='255,255,255' opacity='0.8' zIndex='-1' count='120' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'default',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+  <script src="//cdn.jsdelivr.net/npm/quicklink@1/dist/quicklink.umd.js"></script>
+  <script>
+      window.addEventListener('load', () => {
+      quicklink({
+        timeout : 3000,
+        priority: true,
+        ignores : [uri => uri.includes('#'),uri => uri === 'https://hexo-archive.zivmax.top/%E5%AD%A6%E4%B9%A0/%E4%BD%9C%E4%B8%9A/2024/03/26/CS110/CS110-Lab-3/',]
+      });
+      });
+  </script>
+
+
+
+</body>
+</html>
+
