@@ -35,7 +35,7 @@
     "hexo-theme-landscape": "^1.1.0",
     "hexo-theme-next": "^8.22.0",
     "katex": "^0.16.21",
-    "npm-check": "^3.2.10"
+    "npm-check": "^6.0.1"
   },
   "devDependencies": {
     "highlight.js": "^11.11.1"
