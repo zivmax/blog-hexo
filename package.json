@@ -16,7 +16,7 @@
     "@renbaoshuo/markdown-it-katex": "^2.0.2",
     "composer": "^4.1.0",
     "gh-pages": "^6.3.0",
-    "hexo": "^7.3.0",
+    "hexo": "^8.0.0",
     "hexo-deployer-git": "^4.0.0",
     "hexo-filter-image": "^1.2.3",
     "hexo-generator-archive": "^2.0.0",
